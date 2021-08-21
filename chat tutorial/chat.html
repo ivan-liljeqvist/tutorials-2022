@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <title>Vanilla Boilerplate</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://npmcdn.com/moralis@0.0.6/dist/moralis.js"></script>
+  </head>
+
+    <body>
+
+      <p>CHAT</p>
+
+      <div id="chatHistory">
+        <ul id="historyList"></ul>
+      </div>
+
+      <input type="text" id="chatInput"/>
+      <input type="button" value="Send Message" id="sendButton"/>
+
+      <script>
+        // connect to Moralis server
+        Moralis.initialize("O2gN8tmm4fMDlUqaHcZ5zmskUGOlfdQL6EDhQULT");
+        Moralis.serverURL = "https://pcazywqrum6f.moralisweb3.com:2053/server";
+
+        const queryString = window.location.search;
+        const params = new URLSearchParams(queryString);
+        const chatId = params.get('id')
+        console.log(chatId)
+
+        async function init(){
+          let query = new Moralis.Query('Message');
+          let subscription = await query.subscribe();
+
+          const historyList = document.getElementById("historyList");
+
+          subscription.on('create', (object) => {
+            if(object.get("group") == chatId){
+              var listItem = document.createElement('li');
+              listItem.innerHTML = object.get("sender") + " says:<br>"+object.get("text")+"<br>"
+              historyList.appendChild(listItem);
+            }
+          });
+        }
+
+
+
+        async function getHistory(){
+          const Message = Moralis.Object.extend("Message");
+          const query = new Moralis.Query(Message);
+          query.equalTo("group",chatId)
+          const results = await query.find();
+
+          const historyList = document.getElementById("historyList");
+
+          for (let i = 0; i < results.length; i++) {
+            const object = results[i];
+            var listItem = document.createElement('li');
+            listItem.innerHTML = object.get("sender") + " says:<br>"+object.get("text")+"<br>"
+            historyList.appendChild(listItem);
+          }
+
+        }
+
+        init()
+        getHistory()
+
+
+        async function sendMessage(){
+          let user = Moralis.User.current();
+          let message =  document.getElementById("chatInput").value;
+
+          if(message && message.length>0){
+            const Message = Moralis.Object.extend("Message");
+            const m = new Message();
+            m.set("sender",user.get("ethAddress"))
+            m.set("text",message)
+            m.set("group",chatId)
+
+            m.save()
+
+            console.log("sending " + message + " from " + user.get("ethAddress") + " in group " + chatId)
+          }
+        }
+
+        document.getElementById("sendButton").onclick = sendMessage;
+
+
+      </script>
+
+    </body>
+
+</html>
