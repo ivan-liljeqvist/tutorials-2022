@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>Vanilla Boilerplate</title>
+
+	  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://npmcdn.com/moralis/dist/moralis.js"></script>
+
+  </head>
+
+  <body>
+
+    <button id="btn-login">Moralis Login</button>
+    <button id="btn-logout">Logout</button>
+    <br><br>
+
+    <script>
+      // connect to Moralis server
+      Moralis.initialize("ppKsJ87zo59ln2WnmJm3n66TM9mq06I4GYGqLxRq");
+      Moralis.serverURL = "https://5naflsgtclgx.moralisweb3.com:2053/server";
+
+
+      // add from here down
+      async function login() {
+        let user = Moralis.User.current();
+        if (!user) {
+          user = await Moralis.Web3.authenticate();
+          launch()
+        }
+        console.log("logged in user:", user);
+      }
+
+      async function logOut() {
+        await Moralis.User.logOut();
+        console.log("logged out");
+        location.reload();
+      }
+
+
+      document.getElementById("btn-login").onclick = login;
+      document.getElementById("btn-logout").onclick = logOut;
+
+    </script>
+
+
+  </body>
+
+
+</html>

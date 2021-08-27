@@ -44,7 +44,10 @@
       var game;
 
       var platforms;
+      
       var player;
+      var competitors = {};
+
       var cursor;
 
       var jumpHeight = -300;
@@ -74,7 +77,7 @@
       }
 
       // initial setup
-      function create ()
+      async function create ()
       {
         this.add.image(400, 300, 'background').setScale(0.55);
 
@@ -92,10 +95,33 @@
         cursors = this.input.keyboard.createCursorKeys();
 
 
+        let user = Moralis.User.current();
+        let query = new Moralis.Query('PlayerPosition');
+        let subscription = await query.subscribe();
+        subscription.on('create', (plocation) => {
+          if(plocation.get("player") != user.get("ethAddress")){
+
+            // if first time seeing
+            if(competitors[plocation.get("player")] == undefined){
+              // create a sprite
+              competitors[plocation.get("player")] = this.add.image( plocation.get("x"), plocation.get("y"), 'player').setScale(0.3);
+            }
+            else{
+              competitors[plocation.get("player")].x = plocation.get("x");
+              competitors[plocation.get("player")].y = plocation.get("y");
+            }
+
+            console.log("someone moved!")
+            console.log(plocation.get("player"))
+            console.log("new X ", plocation.get("x"))
+            console.log("new Y ", plocation.get("y"))
+          }
+        });
+
       }
 
       // 60 times per second  - 60 frames per second
-      function update ()
+      async function update ()
       {
         // LOGIC
         if (cursors.left.isDown)
@@ -115,6 +141,24 @@
         {
             player.setVelocityY(jumpHeight);
         }
+
+        if(player.lastX!=player.x  || player.lastY!=player.y){
+          let user = Moralis.User.current();
+          
+          const PlayerPosition = Moralis.Object.extend("PlayerPosition");
+          const playerPosition = new PlayerPosition();
+
+          playerPosition.set("player",user.get("ethAddress"));
+          playerPosition.set("x",player.x);
+          playerPosition.set("y",player.y)
+
+          player.lastX = player.x;
+          player.lastY = player.y;
+
+          await playerPosition.save();
+        }
+        
+
       }
 
 
