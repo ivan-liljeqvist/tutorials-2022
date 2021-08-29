@@ -51,7 +51,7 @@
       var cursor;
 
       var jumpHeight = -300;
-
+      var that;
 
       function launch(){
         let user = Moralis.User.current();
@@ -69,11 +69,37 @@
 
 
       // loading assets
-      function preload ()
+      async function preload ()
       {
+        that = this;
         this.load.image('background', 'assets/BG.png');
         this.load.image('ground', 'assets/Tiles/Tile (2).png');
-        this.load.image('player', 'assets/player.png');
+        this.load.image('comptetitor', 'assets/player.png');
+
+
+        // fetch player SVG
+        const numericTraits = [1, 5, 99, 29, 1, 1]; // UI to change the traits
+        const equippedWearables = [23,8,4,43,0,4,0,1,0,0,0,3,7,0,0,0];
+
+        const rawSVG = await Moralis.Cloud.run("getSVG",{numericTraits:numericTraits,equippedWearables:equippedWearables})
+        
+        const svgBlob = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"})
+        const url = URL.createObjectURL(svgBlob)
+        
+        this.load.image('player',url);
+
+        this.load.on('filecomplete', function(){
+
+          initPlayer()
+        }, this);
+
+        this.load.start()
+      }
+
+      async function initPlayer(){
+        player = that.physics.add.sprite(500, 250, 'player').setScale(1).refreshBody();
+        player.setBounce(0.3);
+        that.physics.add.collider(player, platforms);
       }
 
       // initial setup
@@ -88,10 +114,7 @@
         platforms.create(600, 400, 'ground').setScale(0.5).refreshBody();
         platforms.create(665, 400, 'ground').setScale(0.5).refreshBody();
 
-        player = this.physics.add.sprite(500, 250, 'player').setScale(0.3).refreshBody();
-        player.setBounce(0.3);
-
-        this.physics.add.collider(player, platforms);
+        
         cursors = this.input.keyboard.createCursorKeys();
 
 
@@ -104,7 +127,7 @@
             // if first time seeing
             if(competitors[plocation.get("player")] == undefined){
               // create a sprite
-              competitors[plocation.get("player")] = this.add.image( plocation.get("x"), plocation.get("y"), 'player').setScale(0.3);
+              competitors[plocation.get("player")] = this.add.image( plocation.get("x"), plocation.get("y"), 'comptetitor').setScale(0.3);
             }
             else{
               competitors[plocation.get("player")].x = plocation.get("x");
@@ -123,6 +146,9 @@
       // 60 times per second  - 60 frames per second
       async function update ()
       {
+        if(!player)
+          return;
+
         // LOGIC
         if (cursors.left.isDown)
         {
@@ -181,6 +207,9 @@
 
       document.getElementById("btn-login").onclick = login;
       document.getElementById("btn-logout").onclick = logOut;
+
+
+      
 
     </script>
 
