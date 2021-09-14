@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <title>Vanilla Boilerplate</title>
+
+	  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
+
+    <style>
+      h2{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size:10px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <h2>Swap ETH to 1INCH </h2>
+    <input type="text" value="0.01"></input>
+    <br>
+    <button id="btn-login" onclick="swap()">SWAP!</button>
+
+    
+
+
+
+    <br><br>
+
+    <script>
+      // connect to Moralis server
+      Moralis.initialize("ppKsJ87zo59ln2WnmJm3n66TM9mq06I4GYGqLxRq");
+      Moralis.serverURL = "https://5naflsgtclgx.moralisweb3.com:2053/server";
+
+      let dex;
+
+      (async function(){
+
+          await Moralis.initPlugins();
+          dex = Moralis.Plugins.oneInch;
+
+          await Moralis.enable();
+          if(!Moralis.User.current())
+            await Moralis.authenticate();
+      })();
+
+      async function swap(){
+
+        const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+        const ONEINCH_ADDRESS = "0x111111111117dc0aa78b770fa6a738034120c302";
+
+        const options = {chain:"eth", 
+                              fromTokenAddress:NATIVE_ADDRESS, 
+                              toTokenAddress:ONEINCH_ADDRESS,
+                              amount: Number(Moralis.Units.ETH("0.01")),
+                              fromAddress: Moralis.User.current().get("ethAddress"),
+                              slippage: 1
+                          }
+
+        
+        var receipt = await dex.swap(options);
+        console.log(receipt)
+       
+      }
+
+
+    </script>
+
+
+  </body>
+
+
+</html>

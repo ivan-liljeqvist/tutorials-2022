@@ -3,7 +3,7 @@
     <title>Vanilla Boilerplate</title>
 
 	  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-    <script src="https://npmcdn.com/moralis@0.0.6/dist/moralis.js"></script>
+    <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
 
 
@@ -44,7 +44,7 @@
       var game;
 
       var platforms;
-      
+
       var player;
       var competitors = {};
 
@@ -78,14 +78,14 @@
 
 
         // fetch player SVG
-        const numericTraits = [1, 5, 99, 29, 1, 1]; // UI to change the traits
-        const equippedWearables = [23,8,4,43,0,4,0,1,0,0,0,3,7,0,0,0];
+        const numericTraits = [1, 99, 99, 99, 1, 1]; // UI to change the traits
+        const equippedWearables = [23,6,2,43,0,4,0,1,0,0,0,0,0,0,0,0];
 
         const rawSVG = await Moralis.Cloud.run("getSVG",{numericTraits:numericTraits,equippedWearables:equippedWearables})
-        
+
         const svgBlob = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"})
         const url = URL.createObjectURL(svgBlob)
-        
+
         this.load.image('player',url);
 
         this.load.on('filecomplete', function(){
@@ -97,7 +97,7 @@
       }
 
       async function initPlayer(){
-        player = that.physics.add.sprite(500, 250, 'player').setScale(1).refreshBody();
+        player = that.physics.add.sprite(500, 250, 'player').setScale(0.3).refreshBody();
         player.setBounce(0.3);
         that.physics.add.collider(player, platforms);
       }
@@ -114,7 +114,7 @@
         platforms.create(600, 400, 'ground').setScale(0.5).refreshBody();
         platforms.create(665, 400, 'ground').setScale(0.5).refreshBody();
 
-        
+
         cursors = this.input.keyboard.createCursorKeys();
 
 
@@ -170,7 +170,7 @@
 
         if(player.lastX!=player.x  || player.lastY!=player.y){
           let user = Moralis.User.current();
-          
+
           const PlayerPosition = Moralis.Object.extend("PlayerPosition");
           const playerPosition = new PlayerPosition();
 
@@ -183,7 +183,7 @@
 
           await playerPosition.save();
         }
-        
+
 
       }
 
@@ -209,7 +209,7 @@
       document.getElementById("btn-logout").onclick = logOut;
 
 
-      
+
 
     </script>
 

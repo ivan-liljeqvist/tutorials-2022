@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title>Vanilla Boilerplate</title>
+
+	  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+
+
+  </head>
+
+  <body>
+
+    <button id="btn-login" onclick="iframefiat()">Buy crypto</button>
+    <iframe id="myIframe" src="" width="350" height="650" style="display:none"></iframe> <br>
+
+
+    <br><br>
+
+    <script>
+      // connect to Moralis server
+      Moralis.initialize("ppKsJ87zo59ln2WnmJm3n66TM9mq06I4GYGqLxRq");
+      Moralis.serverURL = "https://5naflsgtclgx.moralisweb3.com:2053/server";
+
+
+      (async function(){
+          Moralis.initPlugins();
+      })();
+
+      function buycrypto(){
+        Moralis.Plugins.fiat.buy();
+      }
+
+      async function iframefiat(){
+        let response = await Moralis.Plugins.fiat.buy({}, {disableTriggers: true});
+        document.getElementById('myIframe').style.display = 'block';
+        document.getElementById('myIframe').src = response.result.data;
+      }
+
+    </script>
+
+
+  </body>
+
+
+</html>
