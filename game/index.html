@@ -74,7 +74,7 @@
         that = this;
         this.load.image('background', 'assets/BG.png');
         this.load.image('ground', 'assets/Tiles/Tile (2).png');
-        this.load.image('comptetitor', 'assets/player.png');
+        this.load.image('competitor', 'assets/player.png');
 
 
         // fetch player SVG
@@ -127,7 +127,7 @@
             // if first time seeing
             if(competitors[plocation.get("player")] == undefined){
               // create a sprite
-              competitors[plocation.get("player")] = this.add.image( plocation.get("x"), plocation.get("y"), 'comptetitor').setScale(0.3);
+              competitors[plocation.get("player")] = this.add.image( plocation.get("x"), plocation.get("y"), 'competitor').setScale(0.3);
             }
             else{
               competitors[plocation.get("player")].x = plocation.get("x");
